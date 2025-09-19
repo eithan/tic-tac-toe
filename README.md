@@ -11,9 +11,12 @@ From top-level project folder, create/activate a virtual environment and
 pip install the requirements.txt file. This will install the adapted
 tic-tac-toe library included in the source as an editable library.
 
-e.g. using pyenv and Python 3.12.2: \
-`pyenv virtualenv 3.12.2 tic-tac-toe-3.12.2` \
-`pyenv activate tic-tac-toe-3.12.2` \
+NOTE: these might need to be installed for TKinter to run properly, then re-install Python 3.12.5
+`brew install openssl readline sqlite3 xz zlib tcl-tk`
+
+e.g. using pyenv and Python 3.12.5: \
+`pyenv virtualenv 3.12.5 tic-tac-toe-3.12.5` \
+`pyenv activate tic-tac-toe-3.12.5` \
 `pip install -r requirements.txt`
 
 ### Running (Tkinter GUI or Console)

@@ -1,0 +1,127 @@
+/* frontend/src/App.css */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #d3d3d3; /* background */
+  font-family: sans-serif;
+}
+
+.App {
+  text-align: center;
+  margin-top: 50px;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  grid-gap: 1px;
+  margin: 20px auto;
+  width: 302px;
+  background-color: #a9a9a9; /* grid lines */
+  padding: 1px;
+}
+
+.cell {
+  width: 100px;
+  height: 100px;
+  font-size: 2.5em;
+  font-weight: bold;
+  background-color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cell:hover:enabled {
+  cursor: pointer;
+}
+
+.cell:hover:enabled.x-player {
+  background-color: rgba(179, 229, 255, 50); /* Softer light blue hover for X player */
+}
+
+.cell:hover:enabled.o-player {
+  background-color: rgba(255, 153, 153, 25); /* Softer light pink hover for O player */
+}
+
+.cell.x {
+  color: rgba(59, 130, 246, 80); /* Blue for X */
+}
+
+.cell.o {
+  color: rgba(255, 0, 0, 80); /* Pink for O (matching the screenshot) */
+}
+
+.status-message {
+  font-size: 1.5em;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.player-selection {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 30px;
+}
+
+.player-dropdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.player-dropdown label {
+  font-weight: 600;
+  font-size: 1.1em;
+  color: #333;
+}
+
+.player-dropdown select {
+  padding: 8px 12px;
+  font-size: 1em;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.player-dropdown select:hover:not(:disabled) {
+  border-color: #999;
+}
+
+.player-dropdown select:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.error-message {
+  color: #ef4444;
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+.reset-button {
+  padding: 12px 24px;
+  font-size: 1em;
+  cursor: pointer;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.reset-button:hover {
+  background-color: #2563eb;
+}
+
