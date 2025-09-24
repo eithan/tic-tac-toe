@@ -1,8 +1,8 @@
-/* frontend/src/App.css */
+/* Tic-Tac-Toe Web UI Styles */
 body {
   margin: 0;
   padding: 0;
-  background-color: #d3d3d3; /* background */
+  background-color: #d3d3d3;
   font-family: sans-serif;
 }
 
@@ -19,7 +19,7 @@ body {
   grid-gap: 1px;
   margin: 20px auto;
   width: 302px;
-  background-color: #a9a9a9; /* grid lines */
+  background-color: #a9a9a9;
   padding: 1px;
 }
 
@@ -41,39 +41,41 @@ body {
   cursor: pointer;
 }
 
+/* Player hover effects */
 .cell.hover-enabled:hover.x-player {
-  background-color: rgba(179, 229, 255, 50); /* Softer light blue hover for X player */
+  background-color: rgba(179, 229, 255, 50);
 }
 
 .cell.hover-enabled:hover.o-player {
-  background-color: rgba(255, 153, 153, 25); /* Softer light pink hover for O player */
+  background-color: rgba(255, 153, 153, 25);
+}
+
+.cell.hover-enabled:hover {
+  background-color: rgba(200, 200, 200, 0.3);
 }
 
 /* Winning cell highlighting - using the same colors as hover states */
 .cell.winning-x {
-  background-color: rgba(179, 229, 255, 50) !important; /* Same as X hover color */
+  background-color: rgba(179, 229, 255, 50) !important;
   border: 2px solid #4fc3f7 !important;
 }
 
 .cell.winning-o {
-  background-color: rgba(255, 153, 153, 25) !important; /* Same as O hover color */
+  background-color: rgba(255, 153, 153, 25) !important;
   border: 2px solid #ff6b6b !important;
-}
-
-.cell.hover-enabled:hover {
-  background-color: rgba(200, 200, 200, 0.3); /* Light gray hover for clickable empty cells */
 }
 
 .cell.hover-disabled:hover {
   cursor: default;
 }
 
+/* Player colors */
 .cell.x {
-  color: rgba(59, 130, 246, 80); /* Blue for X */
+  color: rgba(59, 130, 246, 80);
 }
 
 .cell.o {
-  color: rgba(255, 0, 0, 80); /* Pink for O (matching the screenshot) */
+  color: rgba(255, 0, 0, 80);
 }
 
 .status-message {
