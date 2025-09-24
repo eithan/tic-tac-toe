@@ -3,6 +3,7 @@ from functools import partial
 from tkinter import font
 from .engine import TicTacToeUIEngine
 from tic_tac_toe.logic.models import GameState
+from tic_tac_toe.game.player_factory import PlayerFactory
 
 
 class TicTacToeBoard(tk.Tk):
@@ -50,8 +51,22 @@ class TicTacToeBoard(tk.Tk):
         self._update_display(msg="Ready?")
         self.config(cursor="wait")  # TODO this only applies to parts of window without widgets (?) apply to all?
         self.update()
-        self.engine.prepare_new_game(self._selected_player_x.get(), self._selected_player_o.get())
-        self.engine.process_next_action()
+        
+        try:
+            self.engine.prepare_new_game(self._selected_player_x.get(), self._selected_player_o.get())
+            self.engine.process_next_action()
+        except ValueError as e:
+            # Show user-friendly error message
+            error_msg = str(e)
+            if "AlphaZero" in error_msg:
+                self._update_display(msg="AlphaZero not available. Install neural network dependencies.")
+            else:
+                self._update_display(msg=f"Error: {error_msg}")
+            # Reset to default players
+            self._selected_player_x.set("Human")
+            self._selected_player_o.set("Human")
+            return
+        
         self.config(cursor="")  # reset cursor to normal
         self.update()
 
@@ -115,7 +130,10 @@ class TicTacToeBoard(tk.Tk):
         chooser_frame = tk.Frame(master=self)
         chooser_frame.pack(fill=tk.X, padx=10)
         element_width = 9
-        player_types = list(TicTacToeUIEngine.PLAYER_TYPES.keys())
+        
+        # Get available player types dynamically
+        available_computer_types = PlayerFactory.get_available_types()
+        player_types = ["Human"] + [pt.title() for pt in available_computer_types]  # Capitalize for display
 
         # create dropdown to select X player
         sel_player_x = tk.StringVar(chooser_frame)

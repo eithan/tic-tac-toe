@@ -1,9 +1,9 @@
 from typing import TypeAlias, Callable
 
-from tic_tac_toe.game.players import Player, RandomComputerPlayer, MinimaxComputerPlayer
+from tic_tac_toe.game.players import Player
+from tic_tac_toe.game.player_factory import PlayerFactory
 from tic_tac_toe.logic.models import GameState, Mark, Move, Grid
 from tic_tac_toe.logic.validators import validate_players
-from neuralnet.models.players import AlphaZeroComputerPlayer
 
 
 """ First parameter is the current game state to sync to; second parameter is whether it is the gui's turn to move """
@@ -23,9 +23,9 @@ class TicTacToeUIEngine:
     # human-readable labels pointing to respective classes in order to fetch their constructor for a new instance
     PLAYER_TYPES = {
         "Human": GUIPlayer,
-        "Random": RandomComputerPlayer,
-        "Minimax": MinimaxComputerPlayer,
-        "AlphaZero": AlphaZeroComputerPlayer
+        "Random": "random",
+        "Minimax": "minimax", 
+        "AlphaZero": "alphazero"
     }
 
     game_state: GameState
@@ -54,14 +54,19 @@ class TicTacToeUIEngine:
         """
         self.state_updated_listener = state_updated_listener
         self.ui_delay_callback = ui_delay_callback
+        self.player_factory = PlayerFactory()
         self.prepare_new_game(player_x_type, player_o_type)
 
     def prepare_new_game(self, player_x_type: str, player_o_type: str):
-        self.player1 = self._new_player(player_x_type, Mark("X"))
-        self.player2 = self._new_player(player_o_type, Mark("O"))
-        validate_players(self.player1, self.player2)
-        self.game_state = GameState(Grid(), self.player1.mark)
-        self._state_updated()
+        try:
+            self.player1 = self._new_player(player_x_type, Mark("X"))
+            self.player2 = self._new_player(player_o_type, Mark("O"))
+            validate_players(self.player1, self.player2)
+            self.game_state = GameState(Grid(), self.player1.mark)
+            self._state_updated()
+        except ValueError as e:
+            # Re-raise with context about which player failed
+            raise ValueError(f"Failed to prepare new game: {str(e)}")
 
     def process_next_action(self):
         if self.game_state.game_over:
@@ -76,11 +81,21 @@ class TicTacToeUIEngine:
     def _current_player(self):
         return self.player1 if self.game_state.current_mark == self.player1.mark else self.player2
 
-    def _new_player(self, player_type: str, mark: Mark) -> Player | None:
-        """ Instantiates a new player with the specified mark if a constructor is fetched, else returns None """
-        class_constructor = self.PLAYER_TYPES.get(player_type)
-        instance = class_constructor(mark) if class_constructor is not None else None
-        return instance
+    def _new_player(self, player_type: str, mark: Mark) -> Player:
+        """ Instantiates a new player with the specified mark. Raises ValueError if player type is invalid. """
+        if player_type == "Human":
+            return GUIPlayer(mark)
+        
+        # Convert capitalized display name to lowercase for factory
+        factory_type = player_type.lower()
+        
+        # Use the unified player factory for computer players
+        try:
+            return self.player_factory.create_player(factory_type, mark)
+        except ValueError as e:
+            # Re-raise with more context for GUI
+            available_types = self.player_factory.get_available_types()
+            raise ValueError(f"Cannot create {player_type} player: {str(e)}. Available types: {', '.join(available_types)}")
 
     def _state_updated(self, gui_move_next: bool = False):
         if callable(self.state_updated_listener):

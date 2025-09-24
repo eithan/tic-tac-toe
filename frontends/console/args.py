@@ -9,13 +9,13 @@ from tic_tac_toe.game.players import (
 from tic_tac_toe.logic.models import Mark
 
 from .players import ConsolePlayer
-from neuralnet.models.players import AlphaZeroComputerPlayer
+from neuralnet.models.players import AlphaZeroStatelessComputerPlayer
 
 PLAYER_CLASSES = {
     "human": ConsolePlayer,
     "random": RandomComputerPlayer,
     "minimax": MinimaxComputerPlayer,
-    "alphazero": AlphaZeroComputerPlayer,
+    "alphazero": AlphaZeroStatelessComputerPlayer,
 }
 
 

@@ -29,45 +29,7 @@ def _create_mcts_bot(game, evaluator):
         verbose=False)
 
 
-class AlphaZeroComputerPlayer(ComputerPlayer):
-    @Timer(text="AZ.init took {:0.4f} seconds")
-    def __init__(self, mark: Mark):
-        """
-        Creates an Alpha Zero computer player in the format required by our actual game.
-        Loading the model takes a little bit of time.
-
-        Loads the trained model from a file distributed with this application.
-        Holds its own game state for syncing with our actual game.
-        """
-        super().__init__(mark)
-        game = pyspiel.load_game("tic_tac_toe")
-        evaluator = az_evaluator.AlphaZeroEvaluator(game, AlphaZeroModel())
-        self._state = game.new_initial_state()
-        self._bot = _create_mcts_bot(game, evaluator)
-
-    def get_computer_move(self, game_state: GameState) -> Move | None:
-        """
-        Alpha Zero computes its next Tic-Tac-Toe move
-
-        First we retrieve our internal history of moves.
-        Next we sync with the actual game state.
-        Then we compute our move.
-        Finally we convert our move to the actual game representation and return it.
-        """
-        history = self._state.history()
-        
-        # TODO: this should only ever play one move at most; rewrite this code to assert this
-        for index, cell in enumerate(game_state.grid.cells):
-            if cell != " " and index not in history:
-                self._state.apply_action(index)
-
-        # compute alpha zero's next move and apply it to alpha zero's internal state (TODO optimize this more?)
-        with Timer(text="AZ.bot.step took {:0.4f} seconds"):
-            action = self._bot.step(self._state)
-        self._state.apply_action(action)
-
-        # return the move as represented by our actual game
-        return game_state.make_move_to(action)
+# AlphaZeroComputerPlayer removed - use AlphaZeroStatelessComputerPlayer instead
 
 class AlphaZeroStatelessComputerPlayer(ComputerPlayer):
     @Timer(text="AZS.init took {:0.4f} seconds")
