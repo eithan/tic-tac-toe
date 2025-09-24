@@ -49,6 +49,17 @@ body {
   background-color: rgba(255, 153, 153, 25); /* Softer light pink hover for O player */
 }
 
+/* Winning cell highlighting - using the same colors as hover states */
+.cell.winning-x {
+  background-color: rgba(179, 229, 255, 50) !important; /* Same as X hover color */
+  border: 2px solid #4fc3f7 !important;
+}
+
+.cell.winning-o {
+  background-color: rgba(255, 153, 153, 25) !important; /* Same as O hover color */
+  border: 2px solid #ff6b6b !important;
+}
+
 .cell.hover-enabled:hover {
   background-color: rgba(200, 200, 200, 0.3); /* Light gray hover for clickable empty cells */
 }

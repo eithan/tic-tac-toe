@@ -32,12 +32,18 @@ class GameStateSerializer:
             message = f"Player {game_state.current_mark.value}'s turn"
             current_player = game_state.current_mark.value
         
-        return {
+        result = {
             "board": board,
             "current_player": current_player,
             "status": status,
             "message": message,
         }
+        
+        # Add winning cells information if game is over and there's a winner
+        if game_state.game_over and game_state.winner and game_state.winning_cells:
+            result["winning_cells"] = game_state.winning_cells
+        
+        return result
     
     @staticmethod
     def from_dict(state_dict: Dict[str, Any]) -> GameState:

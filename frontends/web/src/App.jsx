@@ -186,7 +186,7 @@ function App() {
     return <div>Loading game...</div>;
   }
 
-  const { board, message, status, current_player } = gameState;
+  const { board, message, status, current_player, winning_cells } = gameState;
 
   return (
     <div className="App">
@@ -235,7 +235,8 @@ function App() {
       
       <div className="board">
         {board.map((cell, index) => {
-          const cellClass = `cell ${cell.toLowerCase()} ${gameStarted && status === "in_progress" ? `${current_player.toLowerCase()}-player` : ''}`;
+          const isWinningCell = winning_cells && winning_cells.includes(index);
+          const cellClass = `cell ${cell.toLowerCase()} ${gameStarted && status === "in_progress" ? `${current_player.toLowerCase()}-player` : ''} ${isWinningCell ? `winning-${cell.toLowerCase()}` : ''}`;
           const isCurrentPlayerHuman = (current_player === "X" && xPlayerType === "human") || 
                                       (current_player === "O" && oPlayerType === "human");
           
