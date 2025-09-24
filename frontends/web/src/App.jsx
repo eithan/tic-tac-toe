@@ -14,6 +14,7 @@ function App() {
   const [xPlayerType, setXPlayerType] = useState("human");
   const [oPlayerType, setOPlayerType] = useState("human");
   const [gameStarted, setGameStarted] = useState(false);
+  const [showClickError, setShowClickError] = useState(false);
 
   const fetchGameState = async () => {
     try {
@@ -60,6 +61,7 @@ function App() {
       setGameState(data.game_state);
       setEncodedState(data.encoded_state);
       setError(null);
+      setShowClickError(false); // Clear click error on successful move
       return data.game_state;
     } catch (e) {
       setError(e.message);
@@ -68,7 +70,29 @@ function App() {
   };
 
   const handleMove = async (index) => {
-    if (gameState.status !== "in_progress") return;
+    // Clear any previous click error
+    setShowClickError(false);
+    
+    // If game hasn't started yet and the first player is human, start the game first
+    if (!gameStarted && xPlayerType === "human") {
+      await startOrResetGame();
+      // Wait a moment for the game to start, then make the move
+      setTimeout(async () => {
+        await makeMove(index);
+      }, 100);
+      return;
+    }
+    
+    // If game hasn't started and first player is not human, show error
+    if (!gameStarted && xPlayerType !== "human") {
+      setShowClickError(true);
+      return;
+    }
+    
+    if (gameState.status !== "in_progress") {
+      setShowClickError(true);
+      return;
+    }
     
     const currentPlayer = gameState.current_player;
     const isCurrentPlayerHuman = (currentPlayer === "X" && xPlayerType === "human") || 
@@ -76,6 +100,8 @@ function App() {
     
     if (isCurrentPlayerHuman) {
       await makeMove(index);
+    } else {
+      setShowClickError(true);
     }
   };
 
@@ -129,6 +155,7 @@ function App() {
       setEncodedState(data.encoded_state);
       setGameStarted(true);
       setError(null);
+      setShowClickError(false); // Clear any click error when starting game
     } catch (e) {
       setError("Failed to start/reset game.");
     }
@@ -164,8 +191,13 @@ function App() {
   return (
     <div className="App">
       <h1>Tic-Tac-Toe</h1>
-      <div className="status-message">
-        {!gameStarted ? "Select players and click Play to start" : message}
+      <div className={`status-message ${showClickError ? 'error-message' : ''}`}>
+        {showClickError ? 
+          "Click Play to Start!" :
+          (!gameStarted ? 
+            (xPlayerType === "human" ? "Click any square to start playing!" : "Select players and click Play to start") 
+            : message)
+        }
       </div>
       {error && <div className="error-message">{error}</div>}
       
@@ -206,14 +238,25 @@ function App() {
           const cellClass = `cell ${cell.toLowerCase()} ${gameStarted && status === "in_progress" ? `${current_player.toLowerCase()}-player` : ''}`;
           const isCurrentPlayerHuman = (current_player === "X" && xPlayerType === "human") || 
                                       (current_player === "O" && oPlayerType === "human");
-          const isClickable = gameStarted && cell === "" && status === "in_progress" && isCurrentPlayerHuman;
+          
+          // Allow clicking if:
+          // 1. Game is in progress and it's a human player's turn, OR
+          // 2. Game hasn't started yet and the first player (X) is human, OR
+          // 3. Always allow clicking to show error messages
+          const isClickable = (gameStarted && cell === "" && status === "in_progress" && isCurrentPlayerHuman) ||
+                             (!gameStarted && cell === "" && xPlayerType === "human") ||
+                             true; // Always allow clicking to show error messages
+          
+          // Only show hover effects for valid moves, not for error messages
+          const shouldShowHover = (gameStarted && cell === "" && status === "in_progress" && isCurrentPlayerHuman) ||
+                                 (!gameStarted && cell === "" && xPlayerType === "human");
           
           return (
             <button
               key={index}
-              className={cellClass}
+              className={`${cellClass} ${shouldShowHover ? 'hover-enabled' : 'hover-disabled'}`}
               onClick={() => handleMove(index)}
-              disabled={!isClickable}
+              disabled={false} // Never disable to allow error messages
             >
               {cell}
             </button>

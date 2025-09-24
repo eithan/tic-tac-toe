@@ -37,16 +37,24 @@ body {
   justify-content: center;
 }
 
-.cell:hover:enabled {
+.cell.hover-enabled:hover {
   cursor: pointer;
 }
 
-.cell:hover:enabled.x-player {
+.cell.hover-enabled:hover.x-player {
   background-color: rgba(179, 229, 255, 50); /* Softer light blue hover for X player */
 }
 
-.cell:hover:enabled.o-player {
+.cell.hover-enabled:hover.o-player {
   background-color: rgba(255, 153, 153, 25); /* Softer light pink hover for O player */
+}
+
+.cell.hover-enabled:hover {
+  background-color: rgba(200, 200, 200, 0.3); /* Light gray hover for clickable empty cells */
+}
+
+.cell.hover-disabled:hover {
+  cursor: default;
 }
 
 .cell.x {
@@ -61,6 +69,10 @@ body {
   font-size: 1.5em;
   margin-bottom: 20px;
   font-weight: 500;
+}
+
+.status-message.error-message {
+  color: #ef4444;
 }
 
 .player-selection {
