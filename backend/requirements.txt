@@ -1,9 +1,12 @@
 fastapi
 uvicorn
 python-dotenv
+starlette # for WSGIMiddleware
+
 # Firebase Cloud Functions dependencies
 functions-framework
 firebase-functions
+firebase-admin
 
 # Neural network dependencies (optional)
 absl_py==2.1.0

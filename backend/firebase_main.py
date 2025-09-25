@@ -1,81 +1,36 @@
-# backend/main.py - This is the Firebase-generated file, now modified by you
-import functions_framework
-import uvicorn
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
-from fastapi.exceptions import RequestValidationError
-from starlette.requests import Request as StarletteRequest
-from starlette.responses import Response as StarletteResponse
-from starlette.types import Scope, Receive, Send
+# backend/firebase_main.py (or functions/main.py - adjust path as needed)
+import os
+from firebase_functions.https import onRequest # Use Firebase's onRequest decorator
+from firebase_admin import initialize_app # For initializing Firebase Admin SDK
+from starlette.middleware.wsgi import WSGIMiddleware # To adapt FastAPI to WSGI environment
 
-# Import your actual FastAPI application instance
-# Make sure this path is correct if your FastAPI app is named something else, e.g., 'your_fastapi_app_name:app'
+# IMPORTANT: Initialize Firebase Admin SDK FIRST.
+# This should happen once globally for your function.
+initialize_app()
+
+# Import your actual FastAPI application instance.
+# Ensure this import path is correct relative to where firebase_main.py is located.
+# If firebase_main.py is in 'functions' and main.py is in 'backend', you might need
+# a relative import like 'from .main import app' if 'backend' is treated as a package,
+# or adjust your project structure/deployment configuration.
+# For simplicity, let's assume 'main.py' is importable directly if it's in a sibling directory
+# or if 'backend' is the root of your functions code.
 from main import app as fastapi_app_instance
 
-# This is a critical step for FastAPI on Cloud Functions:
-# We create a wrapper function that Cloud Functions can call,
-# and this wrapper will then pass the request to your FastAPI app.
-# This pattern is often referred to as a "ASGI wrapper" or "Serverless ASGI Adapter".
+# Wrap your FastAPI app with WSGIMiddleware.
+# This makes your ASGI (FastAPI) application compatible with the WSGI-like
+# request object that Firebase's onRequest decorator provides.
+wsgi_app = WSGIMiddleware(fastapi_app_instance)
 
-@functions_framework.http
-async def serve_fastapi(request):
+# Define your Firebase HTTP Cloud Function using the Firebase SDK decorator
+@onRequest(region="us-central1", timeout_sec=60) # Adjust region and timeout as needed
+def serve_fastapi_function(request):
     """
-    HTTP Cloud Function that serves your FastAPI application.
+    HTTP Firebase Cloud Function that serves your FastAPI application.
     """
-    # Cloud Functions (Flask-like) request object is converted to ASGI scope.
-    # This is a simplified conversion. For more robust solutions, consider
-    # libraries like `asgi-lifespan` or `fastapi-serverless-uvicorn`.
-    # For typical use cases, this manual conversion works well.
+    # The 'request' object here is a Flask-like request.
+    # The WSGIMiddleware handles the conversion to an ASGI scope for FastAPI.
+    return wsgi_app(request)
 
-    # Parse request body (Cloud Functions gives us data directly or via get_json)
-    body = request.get_data() # Gets raw bytes
-    if request.content_type == 'application/json':
-        # FastAPI expects bytes for JSON, so we send raw bytes
-        pass
-    elif request.content_type and 'text/' in request.content_type:
-        # Handle text-based content types if needed
-        body = body.decode('utf-8')
-
-    # Build ASGI scope
-    scope = {
-        "type": "http",
-        "asgi": {"version": "3.0", "spec_version": "2.3"},
-        "http_version": "1.1",
-        "server": ("localhost", 8080), # Placeholder
-        "client": (request.remote_addr, 0) if request.remote_addr else ("127.0.0.1", 0),
-        "scheme": request.scheme,
-        "method": request.method,
-        "root_path": "", # Adjust if your app is mounted on a subpath
-        "path": request.path,
-        "raw_path": request.path.encode('latin-1'),
-        "query_string": request.query_string,
-        "headers": [(key.lower().encode('latin-1'), value.encode('latin-1')) for key, value in request.headers.items()],
-        "state": {},
-        "extensions": {"http.response.template": {}}
-    }
-
-    async def receive() -> dict:
-        return {"type": "http.request", "body": body, "more_body": False}
-
-    async def send(message: dict) -> None:
-        nonlocal response_status, response_headers, response_body
-        if message["type"] == "http.response.start":
-            response_status = message["status"]
-            response_headers = [(k.decode(), v.decode()) for k, v in message["headers"]]
-        elif message["type"] == "http.response.body":
-            response_body += message.get("body", b"")
-
-    response_status = 200
-    response_headers = []
-    response_body = b""
-
-    # Call the FastAPI application
-    await fastapi_app_instance(scope, receive, send)
-
-    # Build Flask-compatible response from collected data
-    cf_response = StarletteResponse(
-        content=response_body,
-        status_code=response_status,
-        headers={k: v for k, v in response_headers}
-    )
-    return cf_response
+# Optional: You can keep your uvicorn __main__ block in main.py for local development,
+# but it won't be used by Firebase Cloud Functions.
