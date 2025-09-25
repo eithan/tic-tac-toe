@@ -15,6 +15,7 @@ jobs:
         working-directory: frontends/web
         env:
           VITE_API_URL: https://tic-tac-toe-api-1063248455981.us-central1.run.app
+          ALLOWED_ORIGINS: https://tic-tac-toe-api-1063248455981.us-central1.run.app
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
