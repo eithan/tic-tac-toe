@@ -10,6 +10,10 @@ numpy==1.26.4
 open_spiel==1.4
 tensorflow==2.16.1
 
+# Firebase dependencies
+firebase-functions
+functions-framework
+
 # Local packages
 -e ./library
 -e ./neuralnet
