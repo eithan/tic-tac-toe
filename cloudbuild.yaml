@@ -24,13 +24,13 @@ steps:
       - '--port'
       - '8080'
       - '--memory'
-      - '1Gi'
+      - '4Gi'
       - '--cpu'
-      - '1'
+      - '2'
       - '--max-instances'
-      - '10'
+      - '5'
       - '--set-env-vars'
-      - 'ENVIRONMENT=production'
+      - 'ENVIRONMENT=production,ALLOWED_ORIGINS=https://ez-tic-tac-toe.web.app'
 
 images:
   - 'gcr.io/$PROJECT_ID/tic-tac-toe-api:$COMMIT_SHA'

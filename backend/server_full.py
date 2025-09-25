@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import os
-from game_logic import GameService
+from tic_tac_toe.game.game_service import GameService
 
 # Environment detection
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
@@ -40,11 +40,14 @@ def get_allowed_origins():
     origins = []
     
     if IS_PRODUCTION:
-        # Production: Only allow specified origins
+        # Production: Always include Firebase Hosting URL and any additional origins
+        origins.append("https://ez-tic-tac-toe.web.app")
+        
+        # Add any additional origins from environment variable
         production_origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
         origins.extend([origin.strip() for origin in production_origins if origin.strip()])
-        if not origins:
-            print("⚠️  No ALLOWED_ORIGINS set for production. This may cause CORS issues.")
+        
+        print(f"🌐 Production CORS origins: {origins}")
     else:
         # Development: Allow common development origins
         origins.extend([
