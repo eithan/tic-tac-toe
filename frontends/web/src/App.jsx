@@ -69,7 +69,7 @@ const App = memo(() => {
   useComputerMoves(gameStarted, gameState, xPlayerType, oPlayerType, makeComputerMove);
 
   if (!gameState) {
-    return <div>Loading game...</div>;
+    return <div>Loading game...(API_BASE_URL: {API_BASE_URL})</div>;
   }
 
   const { board, message, status } = gameState;
