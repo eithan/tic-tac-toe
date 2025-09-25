@@ -6,7 +6,7 @@ const getApiUrl = () => {
     case 'development':
       return import.meta.env.VITE_API_URL || 'http://localhost:8000';
     case 'production':
-      return import.meta.env.VITE_API_URL || 'https://your-backend-url.run.app';
+      return import.meta.env.VITE_API_URL || 'https://tic-tac-toe-api-1063248455981.us-central1.run.app';
     default:
       return 'http://localhost:8000';
   }
