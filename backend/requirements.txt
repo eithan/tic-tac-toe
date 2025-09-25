@@ -1,7 +1,7 @@
 fastapi
 uvicorn
 python-dotenv
-starlette # for WSGIMiddleware
+starlette
 
 # Firebase Cloud Functions dependencies
 functions-framework

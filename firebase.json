@@ -13,9 +13,19 @@
       }
     ]
   },
-  "functions": {
-    "source": "backend",
-    "runtime": "python312",
-    "entryPoint": "serve_fastapi_function"
-  }
+  "functions": [
+    {
+      "codebase": "default",
+      "entryPoint": "serve_fastapi_function",
+      "source": "backend",
+      "runtime": "python313",
+      "ignore": [
+        "venv",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ]
+    }
+  ]
 }
