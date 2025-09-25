@@ -15,7 +15,7 @@ initialize_app()
 # or adjust your project structure/deployment configuration.
 # For simplicity, let's assume 'main.py' is importable directly if it's in a sibling directory
 # or if 'backend' is the root of your functions code.
-from main import app as fastapi_app_instance
+from server import app as fastapi_app_instance
 
 # Wrap your FastAPI app with WSGIMiddleware.
 # This makes your ASGI (FastAPI) application compatible with the WSGI-like
