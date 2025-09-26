@@ -11,5 +11,5 @@ open_spiel==1.4
 tensorflow==2.16.1
 
 # Local packages
--e ./library
--e ./neuralnet
+-e ./lib-tic-tac-toe
+-e ./lib-neuralnet

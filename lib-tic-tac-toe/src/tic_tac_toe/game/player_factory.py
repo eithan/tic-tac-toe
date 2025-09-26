@@ -8,15 +8,10 @@ from .players import Player, RandomComputerPlayer, MinimaxComputerPlayer
 
 # Import neuralnet players with error handling
 try:
-    import sys
-    from pathlib import Path
-    neuralnet_path = Path(__file__).parent.parent.parent.parent / "neuralnet"
-    if str(neuralnet_path) not in sys.path:
-        sys.path.insert(0, str(neuralnet_path))
-    
-    from models.players import AlphaZeroStatelessComputerPlayer
+    from neuralnet.models.players import AlphaZeroStatelessComputerPlayer
     NEURALNET_AVAILABLE = True
-except ImportError:
+except ImportError as e:
+    print(f"Error importing AlphaZeroStatelessComputerPlayer: {e}")
     NEURALNET_AVAILABLE = False
     AlphaZeroStatelessComputerPlayer = None
 
