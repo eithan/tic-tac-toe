@@ -1,73 +1,109 @@
-# Firebase Cloud Functions entry point
-import functions_framework
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
-from starlette.requests import Request as StarletteRequest
-from starlette.responses import Response as StarletteResponse
-import json
-import asyncio
+# backend/main.py
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
 
-# Import the actual FastAPI app from the server module
-from server import app as fastapi_app
+from tic_tac_toe.game.game_service import GameService
 
-@functions_framework.http
-def main(request):
-    """
-    HTTP Cloud Function that serves the FastAPI application.
-    This is the entry point for Firebase Cloud Functions.
-    """
-    # Convert Flask request to ASGI scope
-    scope = {
-        "type": "http",
-        "asgi": {"version": "3.0", "spec_version": "2.3"},
-        "http_version": "1.1",
-        "server": ("localhost", 8080),
-        "client": (request.remote_addr, 0) if request.remote_addr else ("127.0.0.1", 0),
-        "scheme": request.scheme,
-        "method": request.method,
-        "root_path": "",
-        "path": request.path,
-        "raw_path": request.path.encode('latin-1'),
-        "query_string": request.query_string,
-        "headers": [(key.lower().encode('latin-1'), value.encode('latin-1')) for key, value in request.headers.items()],
-        "state": {},
-        "extensions": {"http.response.template": {}}
+# Initialize FastAPI app
+app = FastAPI()
+
+# Configure CORS
+origins = [
+    "http://localhost:5173",  # React development server
+    "http://192.168.1.33:5173", # Hard-coded url to React development server for phone to work
+    "https://dialogic-unponderous-melody.ngrok-free.app",  # ngrok URL
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Initialize game service
+game_service = GameService()
+
+# All conversion and game logic functions have been moved to GameService
+
+@app.post("/game_state", tags=["game"])
+async def get_game_state(request: dict | None = None):
+    """Returns the current game state. If no encoded_state provided, returns initial state."""
+    try:
+        if request and "encoded_state" in request:
+            # Decode the provided game state
+            game_state = game_service.decode_game_state(request["encoded_state"])
+        else:
+            # Return initial game state
+            game_state = game_service.create_initial_game_state()
+        
+        return {
+            "game_state": game_service.get_game_state_dict(game_state),
+            "encoded_state": game_service.encode_game_state(game_state)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/game_move", tags=["game"])
+async def handle_game_move(request: dict):
+    """Processes a move and returns the updated game state."""
+    try:
+        # Extract move, game state, and player types from request
+        move = request.get("move", {})
+        encoded_state = request.get("encoded_state")
+        player_types = request.get("player_types", {})
+        
+        if not encoded_state:
+            raise ValueError("No game state provided")
+        
+        # Decode the current game state
+        current_state = game_service.decode_game_state(encoded_state)
+        
+        # Process the move
+        if move and "index" in move:
+            # Human move
+            updated_state = game_service.make_move(current_state, move["index"])
+        else:
+            # Computer move - determine which player should move
+            current_player = current_state.current_mark.value
+            if current_player == "X":
+                player_type = player_types.get("x_player_type", "human")
+            else:
+                player_type = player_types.get("o_player_type", "human")
+            
+            if player_type == "human":
+                raise ValueError("It's a human player's turn, but no move provided")
+            
+            # Make computer move
+            updated_state = game_service.make_computer_move(current_state, player_type)
+        
+        return {
+            "game_state": game_service.get_game_state_dict(updated_state),
+            "encoded_state": game_service.encode_game_state(updated_state)
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/reset_game", tags=["game"])
+async def reset_game():
+    """Returns a fresh initial game state."""
+    initial_state = game_service.create_initial_game_state()
+    return {
+        "game_state": game_service.get_game_state_dict(initial_state),
+        "encoded_state": game_service.encode_game_state(initial_state)
     }
 
-    # Get request body
-    body = request.get_data()
-    if request.content_type == 'application/json':
-        try:
-            body = json.dumps(request.get_json()).encode('utf-8')
-        except:
-            body = request.get_data()
+@app.get("/player_types", tags=["game"])
+async def get_player_types():
+    """Returns available player types."""
+    return {
+        "player_types": game_service.get_available_player_types()
+    }
 
-    # Response variables
-    response_status = 200
-    response_headers = []
-    response_body = b""
+# Entry point for running with uvicorn
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
 
-    async def receive():
-        return {"type": "http.request", "body": body, "more_body": False}
-
-    async def send(message):
-        nonlocal response_status, response_headers, response_body
-        if message["type"] == "http.response.start":
-            response_status = message["status"]
-            response_headers = [(k.decode(), v.decode()) for k, v in message["headers"]]
-        elif message["type"] == "http.response.body":
-            response_body += message.get("body", b"")
-
-    # Run the FastAPI app
-    async def run_app():
-        await fastapi_app(scope, receive, send)
-
-    # Execute the async function
-    asyncio.run(run_app())
-
-    # Return the response
-    return JSONResponse(
-        content=response_body.decode('utf-8') if response_body else "",
-        status_code=response_status,
-        headers={k: v for k, v in response_headers}
-    )

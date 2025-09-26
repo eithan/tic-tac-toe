@@ -7,7 +7,6 @@ import PlayerSelection from './components/PlayerSelection.jsx';
 import GameBoard from './components/GameBoard.jsx';
 import StatusMessage from './components/StatusMessage.jsx';
 import { PLAYER_TYPES, GAME_STATUS, TIMING } from './constants.js';
-import { config } from './config/environment.js';
 
 const App = memo(() => {
   const [xPlayerType, setXPlayerType] = useState(PLAYER_TYPES.HUMAN);
@@ -70,7 +69,7 @@ const App = memo(() => {
   useComputerMoves(gameStarted, gameState, xPlayerType, oPlayerType, makeComputerMove);
 
   if (!gameState) {
-    return <div>Loading game...(API: {config.API_BASE_URL})</div>;
+    return <div>Loading game...</div>;
   }
 
   const { board, message, status } = gameState;

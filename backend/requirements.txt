@@ -1,20 +1,4 @@
 fastapi
 uvicorn
 python-dotenv
-starlette
 
-# Firebase Cloud Functions dependencies
-functions-framework
-firebase-functions
-firebase-admin
-
-# Neural network dependencies (optional)
-absl_py==2.1.0
-codetiming==1.4.0
-numpy==1.26.4
-open_spiel==1.4
-tensorflow==2.16.1
-
-# Local packages
--e file:///Users/eithan/development/cursor/tic-tac-toe/library
--e file:///Users/eithan/development/cursor/tic-tac-toe/neuralnet

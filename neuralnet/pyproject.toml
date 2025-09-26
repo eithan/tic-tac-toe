@@ -14,9 +14,6 @@ dependencies = [
     "absl-py>=2.1.0",
 ]
 
-[tool.setuptools.packages.find]
-where = ["src"] # Look for packages inside the 'src' directory
-
 [project.optional-dependencies]
 dev = [
     "pytest",
