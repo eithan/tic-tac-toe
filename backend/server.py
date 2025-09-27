@@ -103,6 +103,17 @@ async def get_player_types():
         "player_types": game_service.get_available_player_types()
     }
 
+# Health check endpoint
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for load balancers."""
+    return {
+        "status": "healthy",
+        "environment": "TODO",
+        "security_enabled": "TODO",
+        "message": "Tic-Tac-Toe API is running!"
+    }
+
 # Entry point for running with uvicorn
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
