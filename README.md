@@ -36,7 +36,7 @@ options: \
 
 ### Code
 
-The new code is primarily located in `frontends/gui` and `neuralnet/`.
+The new code is primarily located in `frontends/gui` and `lib-tic-tac-toe-ai/`.
 
 The Tkinter GUI code was adapted from [here](https://realpython.com/tic-tac-toe-python/) with the following changes:
 
@@ -46,8 +46,8 @@ The Tkinter GUI code was adapted from [here](https://realpython.com/tic-tac-toe-
 
 The AlphaZero code uses the amazing open-spiel library and was adapted from their example [here](https://github.com/google-deepmind/open_spiel/blob/master/open_spiel/python/examples/tic_tac_toe_alpha_zero.py).
 
-* First it was trained on some number of iterations to generate a model (see `neuralnet/training/tic_tac_toe_alpha_zero.py`)
-* Then the generated model was stored for loading by the game when needed (see `neuralnet/models/checkpoints`).
+* First it was trained on some number of iterations to generate a model (see `lib-tic-tac-toe-ai/training/tic_tac_toe_alpha_zero.py`)
+* Then the generated model was stored for loading by the game when needed (see `lib-tic-tac-toe-ai/src/tic_tac_toe/models/az_model`).
 * An AI player was created called AlphaZeroComputerPlayer that loads the trained model, syncs with the real game state, and proposes the next move when it has a turn.
 
 Sincere thanks to the tutorial authors from realpython.com mentioned in the source below!
@@ -61,13 +61,13 @@ If not, you will get a TensorFlow error and not be able to train your model.
 NOTE: You do NOT need to run this code, but if you are interested in how the AlphaZero model was trained to play tic-tac-toe
 you can run the OpenSpiel sample, modified slightly and stored in this repo, as follows:
 
-`cd neuralnet/training` \
+`cd lib-tic-tac-toe-ai/training` \
 `python tic_tac_toe_alpha_zero.py -path "./checkpoints"` \
-`cp ./checkpoints/checkpoint--1* ../models/az_model/`
+`cp ./checkpoints/checkpoint--1* ../src/tic_tac_toe_ai/models/az_model/`
 
 This will save the generated model, along with checkpoints and logs, in the path specified above.
-The last line will copy the `checkpoint--1.*` files to `neuralnet/models/az_model` to use your latest trained model in the game. \
-`neuralnet/models/alphazermodel.py` is where the trained model is loaded into AlphaZero.
+The last line will copy the `checkpoint--1.*` files to `lib-tic-tac-toe-ai/src/tic_tac_toe_ai/models/az_model` to use your latest trained model in the game. \
+`lib-tic-tac-toe-ai/src/tic_tac_toe_ai/models/alphazeromodel.py` is where the trained model is loaded into AlphaZero.
 
 ### Sources
 

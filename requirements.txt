@@ -12,4 +12,4 @@ tensorflow==2.16.1
 
 # Local packages
 -e ./lib-tic-tac-toe
--e ./lib-neuralnet
+-e ./lib-tic-tac-toe-ai

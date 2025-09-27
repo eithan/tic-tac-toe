@@ -6,13 +6,13 @@ from typing import Dict, Type, Optional
 from ..logic.models import Mark
 from .players import Player, RandomComputerPlayer, MinimaxComputerPlayer
 
-# Import neuralnet players with error handling
+# Import AI players with error handling
 try:
-    from neuralnet.models.players import AlphaZeroStatelessComputerPlayer
-    NEURALNET_AVAILABLE = True
+    from tic_tac_toe_ai.models.players import AlphaZeroStatelessComputerPlayer
+    AI_AVAILABLE = True
 except ImportError as e:
     print(f"Error importing AlphaZeroStatelessComputerPlayer: {e}")
-    NEURALNET_AVAILABLE = False
+    AI_AVAILABLE = False
     AlphaZeroStatelessComputerPlayer = None
 
 
@@ -34,7 +34,7 @@ class PlayerFactory:
     def get_available_types(cls) -> list[str]:
         """Get list of available player types."""
         types = list(cls._player_types.keys())
-        if NEURALNET_AVAILABLE:
+        if AI_AVAILABLE:
             types.append("alphazero")
         return types
     
@@ -42,8 +42,8 @@ class PlayerFactory:
     def create_player(cls, player_type: str, mark: Mark) -> Player:
         """Create a player instance of the specified type."""
         if player_type == "alphazero":
-            if not NEURALNET_AVAILABLE:
-                raise ValueError("AlphaZero player not available - neuralnet module not found")
+            if not AI_AVAILABLE:
+                raise ValueError("AlphaZero player not available - tic_tac_toe_ai module not found")
             return AlphaZeroStatelessComputerPlayer(mark)
         
         if player_type not in cls._player_types:
